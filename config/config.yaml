@@ -25,9 +25,9 @@ app:
       key: /root/p.key
     listen:
       addr:
-        - 0.0.0.0
+        - "0.0.0.0"
       port:
-        - 8081
+        - "8081"
     hosts:
       - abc.com
     path:
@@ -45,9 +45,9 @@ app:
   - name: fileserver
     listen:
       addr:
-        - 0.0.0.0
+        - "0.0.0.0"
       port:
-        - 8081
+        - "8081"
     hosts:
       - file.com
 #   路径匹配
