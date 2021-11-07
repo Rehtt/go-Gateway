@@ -23,10 +23,7 @@ app:
     tls:
       cert: /root/p.cert
       key: /root/p.key
-    listen:
-      addr:
-        - "0.0.0.0"
-      port:
+    ports:
         - "8081"
     hosts:
       - abc.com
@@ -43,10 +40,7 @@ app:
     block:
       - 127.0.0.1/24
   - name: fileserver
-    listen:
-      addr:
-        - "0.0.0.0"
-      port:
+    ports:
         - "8081"
     hosts:
       - file.com

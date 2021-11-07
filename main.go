@@ -17,8 +17,8 @@ var (
 )
 
 type (
-	port string
-	host string
+	ports interface{}
+	hosts interface{}
 )
 
 func init() {
@@ -28,6 +28,8 @@ func init() {
 		os.Exit(1)
 	}
 }
+
+var listen = map[ports]map[hosts]*tls.Certificate{}
 
 func main() {
 
@@ -55,39 +57,56 @@ func main() {
 	//g.RunListener(t)
 	go g.Run(":8080")
 	//todo 读取配置文件
-	configs := viper.Get("app")
-
-	tlss := map[port]map[host]tls.Certificate{}
-	for _, c := range configs.([]interface{}) {
-		config := c.(map[string]interface{})
-		var addr []string
-		var port []string
-		listenAddress(config, &addr, &port, &tlss)
-
+	apps := viper.Get("app")
+	for _, app := range apps.([]interface{}) {
+		config := app.(map[interface{}]interface{})
+		listenAddress(config)
 	}
+	fmt.Println(listen)
 
 	//http.ListenAndServe(viper.GetString("server.addr")+":"+viper.GetString("server.port"), g)
 	select {}
 }
-func listenAddress(config map[string]interface{}, a, p *[]string, tlss interface{}) error {
-	listen := config["listen"].(map[string]interface{})
-	if listen != nil {
-		if listen["addr"] != nil {
-			*a = listen["addr"].([]string)
+
+// 获取配置文件的端口、hosts以及tls证书
+func listenAddress(config map[interface{}]interface{}) error {
+	portHost := func(f *tls.Certificate) error {
+		por := config["ports"]
+		var port []interface{}
+		if por == nil {
+			if f == nil {
+				port = []interface{}{"80"}
+			} else {
+				port = []interface{}{"443"}
+			}
+		} else {
+			port = por.([]interface{})
 		}
-		if listen["port"] != nil {
-			*p = listen["port"].([]string)
+		for _, p := range port {
+			if listen[ports(p)] == nil {
+				listen[ports(p)] = make(map[hosts]*tls.Certificate)
+			}
+			if config["hosts"] == nil || len(config["hosts"].([]interface{})) == 0 {
+				return fmt.Errorf("null host")
+			}
+			for _, h := range config["hosts"].([]interface{}) {
+				listen[ports(p)][hosts(h)] = f
+			}
 		}
+		return nil
 	}
-	t := config["tls"].(map[string]interface{})
-	if t != nil && t["cert"] != nil && t["key"] != nil {
-		f, err := tls.LoadX509KeyPair(t["cert"].(string), t["key"].(string))
+	t := config["tls"]
+	if t != nil {
+		tl := t.(map[interface{}]interface{})
+		if tl["cert"] == nil || tl["key"] == nil {
+			return fmt.Errorf("not tls file")
+		}
+		f, err := tls.LoadX509KeyPair(tl["cert"].(string), tl["key"].(string))
 		if err != nil {
 			return err
 		}
-		for _, po := range *p {
-			// todo
-			//tlss.(map[port]map[host]tls.Certificate)[po]=f
-		}
+		return portHost(&f)
 	}
+	return portHost(nil)
+
 }
