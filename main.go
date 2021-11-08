@@ -65,14 +65,21 @@ func main() {
 		cert := []tls.Certificate{}
 		for _, file := range f {
 			// todo null
-			cert = append(cert, *file)
+			if file != nil {
+				cert = append(cert, *file)
+			}
 		}
-		conf := &tls.Config{Certificates: cert}
-		t, err := tls.Listen("tcp", "0.0.0.0:"+port.(string), conf)
-		if err != nil {
-			panic(err)
+		if len(cert) != 0 {
+			conf := &tls.Config{Certificates: cert}
+			t, err := tls.Listen("tcp", "0.0.0.0:"+port.(string), conf)
+			if err != nil {
+				panic(err)
+			}
+			go g.RunListener(t)
+		} else {
+			go g.Run(":" + port.(string))
 		}
-		go g.RunListener(t)
+
 	}
 
 	//http.ListenAndServe(viper.GetString("server.addr")+":"+viper.GetString("server.port"), g)
