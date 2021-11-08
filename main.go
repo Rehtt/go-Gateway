@@ -55,16 +55,28 @@ func main() {
 	//conf := &tls.Config{Certificates: []tls.Certificate{a, b, c}}
 	//t, _ := tls.Listen("tcp", "0.0.0.0:443", conf)
 	//g.RunListener(t)
-	go g.Run(":8080")
 	//todo 读取配置文件
 	apps := viper.Get("app")
 	for _, app := range apps.([]interface{}) {
 		config := app.(map[interface{}]interface{})
 		listenAddress(config)
 	}
-	fmt.Println(listen)
+	for port, f := range listen {
+		cert := []tls.Certificate{}
+		for _, file := range f {
+			// todo null
+			cert = append(cert, *file)
+		}
+		conf := &tls.Config{Certificates: cert}
+		t, err := tls.Listen("tcp", "0.0.0.0:"+port.(string), conf)
+		if err != nil {
+			panic(err)
+		}
+		go g.RunListener(t)
+	}
 
 	//http.ListenAndServe(viper.GetString("server.addr")+":"+viper.GetString("server.port"), g)
+
 	select {}
 }
 
