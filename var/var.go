@@ -5,18 +5,26 @@
 
 package _var
 
-import "crypto/tls"
+import (
+	"crypto/tls"
+	"go-Gateway/models"
+)
 
 type (
-	Ports     interface{}
-	Hosts     interface{}
-	RouteInfo struct {
-		Name    string
-		TLS     string
-		Path    map[string]string
-		Service []string
+	Ports       string
+	Hosts       string
+	IP          [4][2]uint8
+	Name        string
+	ServiceName string
+	TLSName     string
+	RouteInfo   struct {
+		Name      string
+		TLS       string
+		Path      map[string]ServiceName
+		BlackList []IP
 	}
 	Service struct {
+		Name string
 		Type string
 		*Proxy
 		*FileBrowser
@@ -32,6 +40,7 @@ type (
 
 var (
 	Listen   = map[Ports]map[Hosts]*RouteInfo{}
-	Services = map[string]Service{}
-	TLSFile  = map[string]tls.Certificate{}
+	Services = map[ServiceName]Service{}
+	TLSFile  = map[TLSName]tls.Certificate{}
+	Config   = models.Config{}
 )

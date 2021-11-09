@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	initConfig "go-Gateway/config"
 	"go-Gateway/router"
 	"go-Gateway/router/middleware"
+	_var "go-Gateway/var"
 	"os"
 )
 
@@ -20,6 +22,7 @@ func init() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+	viper.Unmarshal(&_var.Config)
 }
 
 func main() {
@@ -29,8 +32,10 @@ func main() {
 		// 中间件
 		middleware.Block,
 	)
-	GetTLS()
-	GetServices()
-	GetApps()
-	OpenPort(g)
+	initApp()
+	fmt.Println(_var.Listen)
+	fmt.Println(_var.Config)
+	fmt.Println(_var.Services)
+	fmt.Println(_var.TLSFile)
+	openPort(g)
 }
