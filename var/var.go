@@ -32,6 +32,6 @@ type (
 )
 
 var (
-	Listen  = map[Ports]map[Hosts]RouteInfo{}
+	Listen  = map[Ports]map[Hosts]*RouteInfo{}
 	TLSFile = map[string]tls.Certificate{}
 )

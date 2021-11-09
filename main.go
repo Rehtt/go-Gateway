@@ -11,6 +11,7 @@ import (
 	"go-Gateway/router/middleware"
 	_var "go-Gateway/var"
 	"log"
+	"math/rand"
 	"os"
 )
 
@@ -36,8 +37,7 @@ func main() {
 	GetTLS()
 	GetServices()
 	GetApps()
-
-	select {}
+	OpenPort(g)
 }
 
 // 获取tls文件
@@ -69,4 +69,34 @@ func GetApps() {
 // todo 读取service
 func GetServices() {
 
+}
+
+// 监听端口
+func OpenPort(engine *gin.Engine) {
+	for port, hosts := range _var.Listen {
+		cert := map[string]*tls.Certificate{}
+		for _, route := range hosts {
+			if route.TLS != "" {
+				if file, ok := _var.TLSFile[route.TLS]; ok {
+					cert[route.TLS] = &file
+				}
+
+			}
+		}
+		if len(cert) == 0 {
+			go engine.Run(":" + port.(string))
+		} else {
+			tlss := []tls.Certificate{}
+			for _, file := range cert {
+				tlss = append(tlss, *file)
+			}
+			listen, err := tls.Listen("tcp", "0.0.0.0:"+port.(string), &tls.Config{Certificates: tlss})
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			go engine.RunListener(listen)
+		}
+	}
+	select {}
 }
