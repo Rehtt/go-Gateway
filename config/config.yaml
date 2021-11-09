@@ -22,7 +22,7 @@ app:
   - name: vles
     tls: t-0
     ports:
-        - "8081"
+      - "8081"
     hosts:
       - abc.com
     path:
@@ -33,7 +33,7 @@ app:
 
   - name: fileserver
     ports:
-        - "8081"
+      - "8081"
     hosts:
       - file.com
 #   路径匹配
@@ -41,16 +41,16 @@ app:
       - path: "/"
         bind: file
 
-service:
+services:
   - name: test-proxy
-      type: proxy
-      addr: "http://127.0.0.1:8901"
-      header:
-        - key: X-Forwarded-For
-          value: $remote_ip
+    type: proxy
+    addr: "http://127.0.0.1:8901"
+    header:
+      - key: X-Forwarded-For
+        value: $remote_ip
   - name: file
-      type: filebrowser
-      root: "/root/file/"
+    type: filebrowser
+    root: "/root/file/"
 tls:
   - name: t-0
     cert: /root/p.cert

@@ -14,13 +14,12 @@ type (
 		Name    string
 		TLS     string
 		Path    map[string]string
-		Service map[string]Service
+		Service []string
 	}
 	Service struct {
-		Name string
 		Type string
-		Proxy
-		FileBrowser
+		*Proxy
+		*FileBrowser
 	}
 	Proxy struct {
 		Addr   string
@@ -32,6 +31,7 @@ type (
 )
 
 var (
-	Listen  = map[Ports]map[Hosts]*RouteInfo{}
-	TLSFile = map[string]tls.Certificate{}
+	Listen   = map[Ports]map[Hosts]*RouteInfo{}
+	Services = map[string]Service{}
+	TLSFile  = map[string]tls.Certificate{}
 )
