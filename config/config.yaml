@@ -20,25 +20,17 @@
 
 app:
   - name: vles
-    tls:
-      cert: /root/p.cert
-      key: /root/p.key
+    tls: t-0
     ports:
         - "8081"
     hosts:
       - abc.com
     path:
       - path: "/download"
-        bind: test
-    proxy:
-      - name: test
-        type: http
-        addr: "http://127.0.0.1:8901"
-        header:
-          - key: X-Forwarded-For
-            value: $remote_ip
+        service: test-proxy
     block:
       - 127.0.0.1/24
+
   - name: fileserver
     ports:
         - "8081"
@@ -48,7 +40,18 @@ app:
     path:
       - path: "/"
         bind: file
-#   文件服务器
-    filebrowser:
-      - name: file
-        root: "/root/file/"
+
+service:
+  - name: test-proxy
+      type: proxy
+      addr: "http://127.0.0.1:8901"
+      header:
+        - key: X-Forwarded-For
+          value: $remote_ip
+  - name: file
+      type: filebrowser
+      root: "/root/file/"
+tls:
+  - name: t-0
+    cert: /root/p.cert
+    key: /root/p.key
