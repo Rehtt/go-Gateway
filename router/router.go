@@ -14,8 +14,8 @@ func LoadRouter(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		c.String(http.StatusNotFound, "The incorrect API route.")
 	})
 
-	g.Group("/", func(context *gin.Context) {
-
+	g.Any("/", func(context *gin.Context) {
+		context.Writer.WriteString("123")
 	})
 	return g
 }

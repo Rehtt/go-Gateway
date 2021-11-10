@@ -13,12 +13,14 @@ import (
 	"github.com/gin-gonic/gin"
 	_var "go-Gateway/var"
 	"log"
+	"runtime"
 )
 
 func initApp() {
 	getTLS()
 	getServices()
 	getApps()
+	runtime.GC()
 }
 
 // 获取tls文件
@@ -41,24 +43,27 @@ func getApps() {
 		if app.Name == "" {
 			log.Fatalln("app name is null")
 		}
-		path := map[string]_var.ServiceName{}
+		path := map[string]_var.Path{}
 		for _, p := range app.Path {
-			path[p.Path] = _var.ServiceName(p.Service)
+			path[p.Path] = _var.Path{
+				BlackList:   initBlockList(p.Block),
+				ServiceName: "",
+			}
 		}
 		route := _var.RouteInfo{
-			Name:      app.Name,
-			TLS:       app.TLS,
-			Path:      path,
-			BlackList: initBlockList(app.Block),
+			Name: app.Name,
+			Port: _var.Port(app.Port),
+			TLS:  _var.TLSName(app.TLS),
+			Path: path,
 		}
-		fmt.Println(route)
-		for _, p := range app.Ports {
-			for _, h := range app.Hosts {
-				if _var.Listen[_var.Ports(p)] == nil {
-					_var.Listen[_var.Ports(p)] = make(map[_var.Hosts]*_var.RouteInfo)
-				}
-				_var.Listen[_var.Ports(p)][_var.Hosts(h)] = &route
-			}
+		// 收集监听端口
+		if _var.Ports[route.Port] == nil {
+			_var.Ports[route.Port] = make(map[_var.TLSName]struct{})
+		}
+		_var.Ports[route.Port][route.TLS] = struct{}{}
+
+		for _, h := range app.Hosts {
+			_var.Listen[_var.Host(h)] = &route
 		}
 	}
 }
@@ -96,23 +101,18 @@ func getServices() {
 
 // 监听端口
 func openPort(engine *gin.Engine) {
-	for port, hosts := range _var.Listen {
-		cert := map[string]*tls.Certificate{}
-		for _, route := range hosts {
-			if route.TLS != "" {
-				if file, ok := _var.TLSFile[_var.TLSName(route.TLS)]; ok {
-					cert[route.TLS] = &file
-				}
+	for port, tlsName := range _var.Ports {
+		certs := []tls.Certificate{}
+		for name := range tlsName {
+			if t, ok := _var.TLSFile[name]; ok {
+				certs = append(certs, t)
 			}
+
 		}
-		if len(cert) == 0 {
+		if len(certs) == 0 {
 			go engine.Run(":" + string(port))
 		} else {
-			tlss := []tls.Certificate{}
-			for _, file := range cert {
-				tlss = append(tlss, *file)
-			}
-			listen, err := tls.Listen("tcp", "0.0.0.0:"+string(port), &tls.Config{Certificates: tlss})
+			listen, err := tls.Listen("tcp", "0.0.0.0:"+string(port), &tls.Config{Certificates: certs})
 			if err != nil {
 				log.Println(err)
 				return

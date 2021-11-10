@@ -9,13 +9,13 @@ type Config struct {
 	App []struct {
 		Name  string   `yaml:"name"`
 		TLS   string   `yaml:"tls,omitempty"`
-		Ports []string `yaml:"ports"`
+		Port  string   `yaml:"port"`
 		Hosts []string `yaml:"hosts"`
 		Path  []struct {
-			Path    string `yaml:"path"`
-			Service string `yaml:"service"`
+			Path    string   `yaml:"path"`
+			Service string   `yaml:"service"`
+			Block   []string `yaml:"block,omitempty"`
 		} `yaml:"path"`
-		Block []string `yaml:"block,omitempty"`
 	} `yaml:"app"`
 	Services []struct {
 		Name   string `yaml:"name"`

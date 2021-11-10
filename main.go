@@ -33,9 +33,5 @@ func main() {
 		middleware.Block,
 	)
 	initApp()
-	fmt.Println(_var.Listen)
-	fmt.Println(_var.Config)
-	fmt.Println(_var.Services)
-	fmt.Println(_var.TLSFile)
 	openPort(g)
 }

@@ -1,25 +1,24 @@
 app:
   - name: vles
     tls: t-0
-    ports:
-      - "8081"
+    port: "8081"
     hosts:
       - abc.com
     path:
       - path: "/download"
         service: test-proxy
-    block:
-      - 127.0.0.1/24
+        block:
+          - 127.0.0.1/24
 
   - name: fileserver
-    ports:
-      - "8081"
+    port: "8081"
     hosts:
       - file.com
-#   路径匹配
     path:
       - path: "/"
-        bind: file
+        service: file
+        block:
+          - 127.0.0.1/24
 
 services:
   - name: test-proxy

@@ -11,17 +11,21 @@ import (
 )
 
 type (
-	Ports       string
-	Hosts       string
+	Port        string
+	Host        string
 	IP          [4][2]uint8
 	Name        string
 	ServiceName string
 	TLSName     string
 	RouteInfo   struct {
-		Name      string
-		TLS       string
-		Path      map[string]ServiceName
+		Name string
+		Port Port
+		TLS  TLSName
+		Path map[string]Path
+	}
+	Path struct {
 		BlackList []IP
+		ServiceName
 	}
 	Service struct {
 		Name string
@@ -39,7 +43,9 @@ type (
 )
 
 var (
-	Listen   = map[Ports]map[Hosts]*RouteInfo{}
+	Listen = map[Host]*RouteInfo{}
+
+	Ports    = map[Port]map[TLSName]struct{}{}
 	Services = map[ServiceName]Service{}
 	TLSFile  = map[TLSName]tls.Certificate{}
 	Config   = models.Config{}
