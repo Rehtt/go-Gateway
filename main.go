@@ -30,6 +30,7 @@ func main() {
 	router.LoadRouter(
 		g,
 		// 中间件
+		middleware.Filter,
 		middleware.Block,
 	)
 	initApp()

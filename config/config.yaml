@@ -5,7 +5,7 @@ app:
     hosts:
       - abc.com
     path:
-      - path: "/download"
+      - path: "/download"   #正则匹配路径
         service: test-proxy
         block:
           - 127.0.0.1/24
@@ -15,10 +15,9 @@ app:
     hosts:
       - file.com
     path:
-      - path: "/"
+      - path: "/file"
         service: file
         block:
-          - 127.0.0.1/24
 
 services:
   - name: test-proxy

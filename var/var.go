@@ -46,7 +46,7 @@ var (
 	Listen = map[Host]*RouteInfo{}
 
 	Ports    = map[Port]map[TLSName]struct{}{}
-	Services = map[ServiceName]Service{}
+	Services = map[ServiceName]*Service{}
 	TLSFile  = map[TLSName]tls.Certificate{}
 	Config   = models.Config{}
 )

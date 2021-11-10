@@ -80,7 +80,7 @@ func getServices() {
 				for _, key_value := range h {
 					header[key_value.Key] = key_value.Value
 				}
-				_var.Services[_var.ServiceName(service.Name)] = _var.Service{
+				_var.Services[_var.ServiceName(service.Name)] = &_var.Service{
 					Name: service.Name,
 					Type: "proxy",
 					Proxy: &_var.Proxy{
@@ -89,11 +89,13 @@ func getServices() {
 					},
 				}
 			case "filebrowser":
-				_var.Services[_var.ServiceName(service.Name)] = _var.Service{
+				_var.Services[_var.ServiceName(service.Name)] = &_var.Service{
 					Name:        service.Name,
 					Type:        "filebrowser",
 					FileBrowser: &_var.FileBrowser{Root: service.Root},
 				}
+			default:
+				log.Println("config error service type:", service.Type)
 			}
 		}
 	}
