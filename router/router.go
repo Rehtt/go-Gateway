@@ -2,6 +2,7 @@ package router
 
 import (
 	"github.com/gin-gonic/gin"
+	service2 "go-Gateway/service"
 	_var "go-Gateway/var"
 	"net/http"
 )
@@ -21,7 +22,9 @@ func LoadRouter(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		service := _var.Services[serviceName.(_var.ServiceName)]
 		switch service.Type {
 		case "proxy":
+			service2.ReverseProxy(ctx, service)
 		case "filebrowser":
+			service2.FileBrowser(ctx, service)
 		}
 	})
 	return g

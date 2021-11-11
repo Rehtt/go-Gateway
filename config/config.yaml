@@ -1,14 +1,14 @@
 app:
   - name: vles
-    tls: t-0
+#     tls: t-0
     port: "8081"
     hosts:
       - abc.com
     path:
       - path: "/download"   #正则匹配路径
         service: test-proxy
-        block:
-          - 127.0.0.1/24
+#         block:
+#           - 127.0.0.1/24
 
   - name: fileserver
     port: "8081"
@@ -22,7 +22,7 @@ app:
 services:
   - name: test-proxy
     type: proxy
-    addr: "http://127.0.0.1:8901"
+    addr: "http://baidu.com"
     header:
       - key: X-Forwarded-For
         value: $remote_ip

@@ -47,7 +47,7 @@ func getApps() {
 		for _, p := range app.Path {
 			path[p.Path] = _var.Path{
 				BlackList:   initBlockList(p.Block),
-				ServiceName: "",
+				ServiceName: _var.ServiceName(p.Service),
 			}
 		}
 		route := _var.RouteInfo{
@@ -99,6 +99,7 @@ func getServices() {
 			}
 		}
 	}
+
 }
 
 // 监听端口
